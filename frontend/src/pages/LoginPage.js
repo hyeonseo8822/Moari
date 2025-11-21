@@ -1,11 +1,13 @@
 // src/pages/LoginPage.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // useContext 추가
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithPopup, signInWithCustomToken } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
+import { NotificationContext } from '../context/NotificationContext'; // NotificationContext 추가
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { showNotification } = useContext(NotificationContext); // showNotification 가져오기
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -13,37 +15,69 @@ function LoginPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!email || !password) {
-      alert('Please enter email and password.');
+      showNotification('이메일과 비밀번호를 모두 입력해주세요.', 'error');
       return;
     }
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // 로그인 성공 시 App.js가 알아서 감지하므로 바로 이동만 하면 됨
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || '알 수 없는 오류가 발생했습니다.');
+      }
+
+      await signInWithCustomToken(auth, data.token);
+      showNotification('로그인 성공!', 'success');
       navigate('/');
     } catch (error) {
       console.error("Login Error:", error);
-      alert('Invalid email or password.');
+      showNotification('이메일 또는 비밀번호가 올바르지 않습니다.', 'error');
     }
   };
 
   // 2. 구글 로그인 처리
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+
+      const response = await fetch('http://localhost:5000/api/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Something went wrong');
+      }
+
+      await signInWithCustomToken(auth, data.token);
+      showNotification('구글 로그인 성공!', 'success');
       navigate('/');
     } catch (error) {
       console.error("Google Login Error:", error);
-      alert("Google login failed.");
+      showNotification("구글 로그인에 실패했습니다.", "error");
     }
   };
 
   return (
     <div className="container">
-      <h2>Login</h2>
+      <h2>로그인</h2>
       <div className="form-container">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">이메일</label>
             <input
               type="email"
               id="email"
@@ -53,7 +87,7 @@ function LoginPage() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">비밀번호</label>
             <input
               type="password"
               id="password"
@@ -62,13 +96,7 @@ function LoginPage() {
               required
             />
           </div>
-          <div className="form-group">
-            <label>
-              <input type="checkbox" required />
-              I agree to the <a href="/terms">Terms and Conditions</a>
-            </label>
-          </div>
-          <button type="submit" className="submit-btn">Login</button>
+          <button type="submit" className="submit-btn">로그인</button>
         </form>
 
         {/* 구글 로그인 버튼 추가 */}
@@ -77,14 +105,14 @@ function LoginPage() {
             type="button" 
             onClick={handleGoogleLogin}
             className="submit-btn" 
-            style={{ backgroundColor: '#4285F4', marginTop: '0' }}
+            style={{ backgroundColor: '#8db3f1ff', marginTop: '0' }}
           >
-            Sign in with Google
+            Google 계정으로 로그인
           </button>
         </div>
 
         <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-          Don't have an account? <Link to="/signup">Sign up</Link>
+          계정이 없으신가요? <Link to="/signup">회원가입</Link>
         </p>
       </div>
     </div>

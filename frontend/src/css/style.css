@@ -1,3 +1,9 @@
+a {
+  text-decoration: none;
+}
+.logoText {
+  color: #fff;
+}
 :root {
   --primary-color: #E8C2C0;
   --primary-hover-color: #D0A09E;
@@ -6,13 +12,16 @@
   --card-background-color: #ffffff;
   --text-color: rgb(117, 104, 87);
   --heading-font: 'Jua', sans-serif;
-  --body-font: 'Noto Sans KR', sans-serif;
+  --body-font: 'Noto Sans KR', sans-serif; /* Keep this for potential future use or fallback */
   --border-color: #F0F0F0;
   --shadow-ㅌcolor: rgba(0, 0, 0, 0.06);
+  --accent-color-pastel-blue: #8BD2E9; /* User-requested pastel blue accent color */
+  --accent-color-pastel-blue-hover: #67BCE0; /* Slightly darker pastel blue for hover */
 }
 
+
 body {
-  font-family: var(--body-font);
+  font-family: var(--heading-font); /* Changed to Jua */
   margin: 0;
   background-color: var(--background-color);
   color: var(--text-color);
@@ -28,7 +37,7 @@ body {
 
 nav {
   background-color: rgb(232, 194, 192);
-  padding: 1rem 2rem;
+  padding: 1.5rem 2rem; /* Increased padding */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -36,44 +45,71 @@ nav {
   position: sticky;
   top: 0;
   z-index: 1000;
+  gap: 1rem; /* Add gap for spacing between sections */
 }
 
-nav h1 {
-  font-family: var(--heading-font);
-  margin: 0;
-  font-size: 2rem;
-  color: var(--card-background-color);
+.nav-left {
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
-nav a {
-    text-decoration: none;
-    color: #FEFBF6
+.nav-center {
+  flex-grow: 1; /* Allow to take up available space */
+  display: flex;
+  justify-content: center; /* Center content within its allocated space */
 }
 
 .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  flex-shrink: 0; /* Prevent shrinking */
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid white;
+  color: white;
+  font-size: 1.2rem; /* Increased font size */
+  width: 100%; /* Fill available space in nav-center */
+  max-width: 400px; /* Limit max width */
+  padding: 0.25rem 0.5rem;
+  outline: none;
+  font-family: var(--heading-font);
+  text-align: left; /* Changed from center to left */
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7); /* Lighter white for placeholder */
+}
+
+.search-input:focus {
+  border-bottom-color: var(--card-background-color); /* Highlight on focus */
 }
 
 .nav-link {
-  font-family: var(--body-font);
-  font-weight: 700;
-  color: var(--card-background-color);
-  padding: 0.5rem 1rem;
+  font-family: var(--heading-font); /* Changed to Jua */
+  font-weight: 500;
+  color: #ffffff; /* Current color */
+  padding: 0.75rem 1.2rem; /* Increased padding */
   border-radius: 20px;
   text-decoration: none;
   transition: background-color 0.3s, color 0.3s;
   border: 2px solid var(--card-background-color);
+  font-size: 1.2rem;
+  
+  /* Added for button styling consistency */
+  background-color: transparent; 
+  border: 2px solid var(--card-background-color); /* Explicitly set border for button */
+  cursor: pointer; /* Indicate clickable */
+  text-align: center;
+  display: inline-block; /* Allows padding and alignment */
+  margin: 0; /* Reset default button margin */
 }
 
 .nav-link:hover {
   background-color: var(--card-background-color);
   color: var(--primary-color);
-}
-
-.nav-link.logout-btn {
-    background-color: transparent;
 }
 
 h2 {
@@ -100,6 +136,7 @@ h2 {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 650px; /* Set a fixed height for uniform card size */
 }
 
 .club-card:hover {
@@ -108,12 +145,17 @@ h2 {
 }
 
 .club-card-image-container {
+    position: relative; /* Needed for absolute positioning of img */
     width: 100%;
-    height: 200px;
+    padding-bottom: 141.4%; /* A4 aspect ratio (297/210 * 100%) */
+    height: 0; /* Override fixed height */
     overflow: hidden;
 }
 
 .club-card-image {
+    position: absolute; /* Position within container */
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -147,8 +189,8 @@ h2 {
 .club-card-footer {
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
-    font-weight: 700;
-    color: var(--primary-color);
+    font-weight: 500;
+    color: #8db3f1; /* Current color */
 }
 
 .form-container {
@@ -156,9 +198,40 @@ h2 {
   padding: 3rem;
   border-radius: 15px;
   box-shadow: 0 4px 12px var(--shadow-color);
-  max-width: 600px;
+  max-width: 800px; /* Increased width for markdown editor */
   margin: 0 auto;
 }
+
+/* Style for SimpleMDE Editor */
+.editor-toolbar {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: var(--background-color);
+  border-color: var(--border-color);
+}
+
+.editor-toolbar button {
+  color: var(--text-color);
+}
+
+.editor-toolbar button.active,
+.editor-toolbar button:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.CodeMirror {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-color: var(--border-color);
+  min-height: 150px; /* Ensure a reasonable default height */
+}
+
+.CodeMirror-fullscreen {
+    background-color: var(--background-color);
+}
+
 
 .form-group {
   margin-bottom: 1.5rem;
@@ -168,6 +241,7 @@ h2 {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 700;
+  font-size: 20px;
 }
 
 .form-group input,
@@ -177,7 +251,11 @@ h2 {
   border: 1px solid #ced4da;
   border-radius: 8px;
   transition: border-color 0.3s, box-shadow 0.3s;
-  font-family: var(--body-font);
+  font-family: var(--heading-font); /* Changed to Jua */
+  font-size: 1.1rem;
+  font-weight: 300;
+  overflow: hidden; /* Hide scrollbar */
+  resize: none; /* Disable manual resize */
 }
 
 .form-group input:focus,
@@ -188,6 +266,7 @@ h2 {
 }
 
 .submit-btn {
+  font-family: var(--heading-font); /* Added Jua font */
   background-color: var(--primary-color);
   color: white;
   padding: 0.75rem 2rem;
@@ -195,7 +274,7 @@ h2 {
   border-radius: 25px;
   cursor: pointer;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 500;
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
   width: 100%;
 }
@@ -204,6 +283,28 @@ h2 {
   background-color: var(--primary-hover-color);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
+}
+
+/* New styles for file input */
+.file-input-hidden {
+  display: none;
+}
+
+.file-input-label {
+  display: inline-block;
+  background-color: #8db3f1;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500 !important;
+  transition: background-color 0.2s;
+  max-width: 75px; /* Adjust as needed */
+}
+
+.file-input-label:hover {
+  background-color: #7AA2E0;
 }
 
 .club-detail {
@@ -224,4 +325,286 @@ h2 {
   height: auto;
   border-radius: 15px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+/* Notification Styles */
+.notification {
+  position: fixed;
+  top: 20px; /* Adjust as needed */
+  left: 50%;
+  transform: translate(-50%, -150%); /* Start off-screen above */
+  padding: 15px 25px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  z-index: 2000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.5s ease-in-out;
+  min-width: 250px;
+  text-align: center;
+}
+
+.notification.show {
+  transform: translate(-50%, 0); /* Move to top center */
+}
+
+.notification.info {
+  background-color: #2196F3;
+}
+
+.notification.success {
+  background-color: #4CAF50;
+}
+
+.notification.error {
+  background-color: #f44336;
+}
+
+.notification .close-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.form-container p a {
+  color: #8db3f1;
+  font-weight: 700;
+}
+
+.accent-link {
+    color: #8db3f1;
+    font-weight: 700;
+}
+
+/* Custom styles for react-datepicker */
+.react-datepicker-custom-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color); /* Use a variable */
+  border-radius: 8px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-family: var(--heading-font);
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+.react-datepicker-custom-input:focus {
+  outline: none;
+  border-color: var(--accent-color-pastel-blue); /* Use accent color */
+  box-shadow: 0 0 0 3px rgba(166, 233, 255, 0.5); /* Use a translucent version of accent color */
+}
+
+.react-datepicker {
+  font-family: var(--body-font); /* Use body font for calendar */
+  border: 1px solid var(--accent-color-pastel-blue); /* Use accent color */
+  border-radius: 8px;
+  background-color: var(--card-background-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  padding: 0.5rem;
+}
+
+.react-datepicker__header {
+  background-color: var(--accent-color-pastel-blue) !important; /* Use accent color */
+  border-bottom: none;
+  padding-top: 0.8rem;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: white !important; /* Keep white for contrast */
+  font-weight: 700;
+}
+
+.react-datepicker__navigation--previous,
+.react-datepicker__navigation--next {
+  filter: brightness(0) invert(1) !important; /* Make arrows white */
+  top: 10px;
+}
+
+.react-datepicker__day {
+  color: var(--text-color) !important;
+  margin: 0.2rem;
+  border-radius: 4px;
+}
+
+.react-datepicker__day--weekend {
+  color: #D3D3D3 !important; /* Light grey for weekends */
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--accent-color-pastel-blue-hover) !important; /* Use accent hover color for selected */
+  color: white !important;
+  font-weight: 700;
+}
+
+.react-datepicker__day--outside-month {
+  color: #ccc !important; /* Lighter color for days outside month */
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--accent-color-pastel-blue-hover) !important; /* Use accent hover color */
+  color: white !important;
+}
+
+.image-preview-container {
+  margin-top: 1rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background-color: var(--card-background-color);
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 4px;
+  object-fit: contain; /* Ensures the whole image is visible */
+}
+
+/* Custom styles for react-tag-input */
+.react-tags {
+  position: relative;
+  padding: 0.75rem 1rem;
+  border: none; /* Removed border */
+  background-color: transparent; /* Set background to transparent */
+  font-family: var(--heading-font);
+  font-size: 1.1rem;
+  min-height: 48px; /* Match input height */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.react-tags__selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.react-tags__tag {
+  display: flex;
+  align-items: center;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  list-style: none;
+}
+
+.react-tags__remove {
+  color: white;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.react-tags__remove:hover {
+  color: var(--background-color);
+}
+
+.react-tags__tagInput {
+  flex-grow: 1;
+  display: inline-block;
+  vertical-align: top;
+  margin-bottom: 0; /* Remove default margin */
+}
+
+.react-tags__tagInputField {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0.25rem 0; /* Adjust padding to align with tags */
+  color: var(--text-color);
+  font-family: var(--heading-font);
+  font-size: 1.1rem;
+  line-height: normal;
+  width: auto;
+  min-width: 100px;
+}
+
+.react-tags__tagInputField::placeholder {
+  color: #a0a0a0;
+}
+
+.react-tags__suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: var(--card-background-color);
+  border: 1px solid var(--border-color);
+  border-top: none;
+  z-index: 100;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.react-tags__suggestions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.react-tags__suggestions li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.react-tags__suggestions li.is-active {
+  background-color: var(--primary-hover-color);
+  color: white;
+}
+
+.react-tags__suggestions li:hover {
+  background-color: var(--primary-hover-color);
+  color: white;
+}
+
+/* Styles for main page one-line intro */
+.club-one-line-intro {
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+}
+
+/* Styles for main page tags */
+.club-tags-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.club-tag-main {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.9rem; /* Increased font size */
+  font-weight: 500;
+  list-style: none;
 }

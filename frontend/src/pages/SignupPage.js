@@ -1,11 +1,11 @@
 // src/pages/SignupPage.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // useContext 추가
 import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase"; // 경로 주의
+import { NotificationContext } from '../context/NotificationContext'; // NotificationContext 추가
 
 function SignupPage() {
   const navigate = useNavigate();
+  const { showNotification } = useContext(NotificationContext); // showNotification 가져오기
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,37 +13,41 @@ function SignupPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     
-    // 비밀번호 확인 로직 (친구 코드 유지)
     if (password !== confirmPassword) {
-      alert('Passwords do not match.');
+      showNotification('비밀번호가 일치하지 않습니다.', 'error');
       return;
     }
 
     try {
-      // 🔥 Firebase로 진짜 유저 생성
-      await createUserWithEmailAndPassword(auth, email, password);
-      alert('Signup successful! Please log in.');
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || '알 수 없는 오류가 발생했습니다.');
+      }
+
+      showNotification('회원가입 성공! 로그인 페이지로 이동합니다.', 'success');
       navigate('/login');
     } catch (error) {
       console.error("Signup Error:", error);
-      if (error.code === 'auth/email-already-in-use') {
-        alert('Email already exists.');
-      } else if (error.code === 'auth/weak-password') {
-        alert('Password should be at least 6 characters.');
-      } else {
-        alert('Signup failed: ' + error.message);
-      }
+      showNotification(error.message, 'error');
     }
   };
 
-  // 👇 화면 디자인은 친구 코드 100% 유지
   return (
     <div className="container">
-      <h2>Sign Up</h2>
+      <h2>회원가입</h2>
       <div className="form-container">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">이메일</label>
             <input
               type="email"
               id="email"
@@ -53,18 +57,18 @@ function SignupPage() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">비밀번호</label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min 6 characters"
+              placeholder="6자리 이상"
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword">비밀번호 확인</label>
             <input
               type="password"
               id="confirmPassword"
@@ -73,10 +77,10 @@ function SignupPage() {
               required
             />
           </div>
-          <button type="submit" className="submit-btn">Sign Up</button>
+          <button type="submit" className="submit-btn">가입하기</button>
         </form>
         <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-          Already have an account? <Link to="/login">Login</Link>
+          이미 계정이 있으신가요? <Link to="/login">로그인</Link>
         </p>
       </div>
     </div>

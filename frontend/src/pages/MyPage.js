@@ -1,23 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-function MyPage({ clubs, currentUser }) {
+function MyPage({ currentUser }) {
+  const [myClubs, setMyClubs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchMyClubs = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/clubs/user/${currentUser.uid}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setMyClubs(data);
+      } catch (e) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyClubs();
+  }, [currentUser]);
+
   if (!currentUser) {
     return (
       <div className="container">
-        <h2>My Page</h2>
-        <p style={{ textAlign: 'center' }}>Please <Link to="/login">login</Link> to see your clubs.</p>
+        <h2>마이페이지</h2>
+        <p style={{ textAlign: 'center' }}>당신의 동아리를 보려면 <Link to="/login">로그인</Link> 해주세요.</p>
       </div>
     );
   }
 
-  const myClubs = clubs.filter(club => club.userId === currentUser.id);
+  if (loading) {
+    return <div className="container"><h2>로딩 중...</h2></div>;
+  }
+
+  if (error) {
+    return <div className="container"><h2>오류: {error.message}</h2></div>;
+  }
 
   return (
     <div className="container">
-      <h2>My Registered Clubs</h2>
+      <h2>내가 등록한 동아리</h2>
       {myClubs.length === 0 ? (
-        <p style={{ textAlign: 'center' }}>You haven't registered any clubs yet. <Link to="/register">Register one now!</Link></p>
+        <p style={{ textAlign: 'center' }}>아직 등록한 동아리가 없습니다. <Link to="/register" className="accent-link">지금 등록해보세요!</Link></p>
       ) : (
         <div className="club-list">
           {myClubs.map(club => (
@@ -34,7 +68,7 @@ function MyPage({ clubs, currentUser }) {
                   <h3>{club.name}</h3>
                   <p>{club.description}</p>
                   <div className="club-card-footer">
-                    <p><strong>Interview:</strong> {club.interviewDate}</p>
+                    <p><strong>면접일:</strong> {club.interviewDate}</p>
                   </div>
                 </div>
               </div>
