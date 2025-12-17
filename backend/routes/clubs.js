@@ -20,11 +20,15 @@ const verifyToken = async (req, res, next) => {
 // Get all clubs
 router.get('/', async (req, res) => {
     try {
-        const clubsSnapshot = await db.collection('clubs').orderBy('createdAt', 'desc').get();
+        const clubsSnapshot = await db.collection('clubs').get();
         const clubs = clubsSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-        }));
+        })).sort((a, b) => {
+            const aTime = a.createdAt?.toMillis?.() || 0;
+            const bTime = b.createdAt?.toMillis?.() || 0;
+            return bTime - aTime; // 최신순 정렬
+        });
         res.status(200).send(clubs);
     } catch (error) {
         console.error("Fetch Clubs Error:", error);
@@ -77,11 +81,17 @@ router.get('/:id', async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
     try {
         const userId = req.params.userId;
-        const clubsSnapshot = await db.collection('clubs').where('userId', '==', userId).orderBy('createdAt', 'desc').get();
-        const clubs = clubsSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+        const clubsSnapshot = await db.collection('clubs').where('userId', '==', userId).get();
+        const clubs = clubsSnapshot.docs
+            .map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            .sort((a, b) => {
+                const aTime = a.createdAt?.toMillis?.() || 0;
+                const bTime = b.createdAt?.toMillis?.() || 0;
+                return bTime - aTime; // 최신순
+            });
         res.status(200).send(clubs);
     } catch (error) {
         console.error("Fetch User Clubs Error:", error);

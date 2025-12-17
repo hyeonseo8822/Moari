@@ -73,6 +73,8 @@ function ClubDetailPage() {
     return <div className="container"><h2>동아리를 찾을 수 없습니다.</h2></div>;
   }
 
+  const isAuthor = currentUser && club && club.userId === currentUser.uid;
+
   return (
     <div className="container">
       <div className="club-detail">
@@ -111,11 +113,13 @@ function ClubDetailPage() {
           </div>
         </div>
 
-        <div className="chat-button-container">
-          <button onClick={handleChatClick} className="chat-btn">
-            채팅하기
-          </button>
-        </div>
+        {!isAuthor && (
+          <div className="chat-button-container">
+            <button onClick={handleChatClick} className="chat-btn">
+              채팅하기
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
